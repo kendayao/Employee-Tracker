@@ -22,6 +22,7 @@ CREATE TABLE employee (
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     role_id INT,
+    manager_id INT,
     PRIMARY KEY(id)
 );
 
@@ -39,8 +40,49 @@ VALUES ("Sales"), ("Engineering"), ("Finance"), ("Legal");
 INSERT INTO role (title, salary, department_id)
 VALUES ("Sales Lead", 80000, 1), ("Salesperson", 60000, 1), ("Lead Engineer", 100000, 2), ("Software Engineer",80000, 2), ("Lead Accountant", 100000, 3), ("Accountant",80000, 3), ("Legal Team Lead", 90000, 4), ("Lawyer", 80000, 4);
 
-INSERT INTO employee (first_name, last_name, role_id)
-VALUES ("John", "Snow", 1), ("Chris", "Numan", 2), ("Mario", "Chase", 2), ("Kaeneth", "Dayao", 3), ("Alex", "Lee", 4), ("Julian", "Fernandez", 4), ("Tiffany", "Tsan", 5), ("George", "Frank", 6), ("Anderson", "Keeper", 6), ("Dan", "King", 7), ("Michael", "Bolt", 8);
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES ("John", "Snow", 1, null), ("Chris", "Numan", 2, 1), ("Mario", "Chase", 2, 1), ("Kaeneth", "Dayao", 3, null), ("Alex", "Lee", 4, 2), ("Julian", "Fernandez", 4, 2), ("Tiffany", "Tsan", 5, null), ("George", "Frank", 6, 3), ("Anderson", "Keeper", 6, 3), ("Dan", "King", 7, null), ("Michael", "Bolt", 8, 4);
 
 INSERT INTO manager (first_name, last_name, department_id)
-VALUES ("John", "Snow", 1), ("Kaeneth", "Dayao", 2), ("Tiffany", "Tsan", 3), ("Dan", "King", 4)
+VALUES ("John", "Snow", 1), ("Kaeneth", "Dayao", 2), ("Tiffany", "Tsan", 3), ("Dan", "King", 4);
+
+-- view all employees with manager
+SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, manager.first_name, manager.last_name
+FROM ((employee 
+LEFT JOIN role ON employee.role_id = role.id)
+LEFT JOIN manager ON  employee.manager_id=manager.id);
+
+-- view all employees with department
+SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary
+FROM role
+INNER JOIN employee ON role.id=employee.role_id
+INNER JOIN department ON  role.department_id=department.id;
+
+-- view employees by department
+SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary
+FROM role
+INNER JOIN employee ON role.id=employee.role_id
+INNER JOIN department ON  role.department_id=department.id
+WHERE department.name='sales' 'engineering' 'finance' 'legal'
+
+-- viewl all employees by roles
+SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary
+FROM employee
+INNER JOIN role ON employee.role_id=role.id WHERE role.title='salesperson' 
+
+-- add employee
+INSERT INTO employee(first_name, last_name, role_id, manager_id)
+VALUES ()
+
+-- add roles
+INSERT INTO role(title, salary, department_id)
+VALUES ()
+
+-- add department
+INSERT INTO department(name)
+VALUES ()
+
+-- update employee roles
+UPDATE employee
+SET role_id = 5
+WHERE first_name=""AND last_name="";
