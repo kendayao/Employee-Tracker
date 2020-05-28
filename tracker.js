@@ -44,7 +44,7 @@ function startapp(){
           break;
 
         case "Add employee":
-          songSearch();
+          addEmployee();
           break;
         
         case "Add department":
@@ -72,10 +72,11 @@ function startapp(){
 
 function viewAllEmployees(){
     const query="SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.department_name, role.salary FROM role INNER JOIN employee ON role.id=employee.role_id INNER JOIN department ON role.department_id=department.id"
-    connection.query(query, function(err,res){
-      if (err) throw err;
-        console.table(res)
-    });
+      connection.query(query, function(err,res){
+        if (err) throw err;
+          console.table(res)
+          startapp();
+      });
 }
 
 function viewDepartment(){
@@ -99,6 +100,7 @@ function viewDepartment(){
           connection.query(query, {department_name: answer.department},function(err,res){
             if (err) throw err;           
             console.table(res)
+            startapp();
             });
         });
 }
@@ -117,6 +119,67 @@ function viewRoles(){
         connection.query(query, {role_title: answer.role}, function(err,res){
           if(err) throw err;
           console.table(res)
+          startapp();
         });
     })
+}
+
+function addEmployee(){
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "firstName",
+      message: "What is the employee's first name?",
+    },
+    {
+      type: "input",
+      name: "lastName",
+      message: "What is the employee's last name?",
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "What is the employee's role?",
+      choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Lead Accountant", "Accountant", "Legal Team Lead", "Lawyer"]
+    },
+    {
+      type: "list",
+      name: "manager",
+      message: "Who is the employees manager?",
+      choices: ["John Snow", "Kaeneth Dayao", "Tiffany Tsan", "Dan King", "None"]
+    }
+
+  ]).then(function(answer){
+      if(answer.role==="Sales Lead"){
+        answer.role=1
+        console.log(answer.role)
+      }else if(answer.role==="Salesperson"){
+        answer.role=2
+      }else if(answer.role==="Lead Engineer"){
+        answer.role=3
+      }else if(answer.role==="Software Engineer"){
+        answer.role=4
+      }else if(answer.role==="Lead Accountant"){
+        answer.role=5
+      }else if(answer.role==="Accountant"){
+        answer.role=6
+      }else if(answer.role==="Legal Team Lead"){
+        answer.role=7
+      }else if(answer.role==="Lawyer"){
+        answer.role=8
+      }
+      if(answer.manager==="John Snow"){
+        answer.manager=1
+      }else if(answer.manager==="Kaeneth Dayao"){
+        answer.manager=2
+      }else if(answer.manager==="Tiffany Tsan"){
+        answer.manager=3
+      }else if(answer.manager==="Dan King"){
+        answer.manager=4
+      }else if(answer.manager==="None"){
+        answer.manager="Null"
+      }
+    console.log(answer.role)
+    console.log(answer.manager)
+    });
 }
