@@ -5,13 +5,13 @@ USE employee_db;
 
 CREATE TABLE department (
     id  INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(30),
+    department_name VARCHAR(30),
     PRIMARY KEY(id)
 );
 
 CREATE TABLE role (
     id INT NOT NULL AUTO_INCREMENT,
-    title VARCHAR(30),
+    role_title VARCHAR(30),
     salary DECIMAL (10,2),
     department_id INT,
     PRIMARY KEY(id)
@@ -34,10 +34,10 @@ CREATE TABLE manager (
     PRIMARY KEY(id)
 );
 
-INSERT INTO department (name)
+INSERT INTO department (department_name)
 VALUES ("Sales"), ("Engineering"), ("Finance"), ("Legal");
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO role (role_title, salary, department_id)
 VALUES ("Sales Lead", 80000, 1), ("Salesperson", 60000, 1), ("Lead Engineer", 100000, 2), ("Software Engineer",80000, 2), ("Lead Accountant", 100000, 3), ("Accountant",80000, 3), ("Legal Team Lead", 90000, 4), ("Lawyer", 80000, 4);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
@@ -47,7 +47,7 @@ INSERT INTO manager (first_name, last_name, department_id)
 VALUES ("John", "Snow", 1), ("Kaeneth", "Dayao", 2), ("Tiffany", "Tsan", 3), ("Dan", "King", 4);
 
 -- view all employees with manager
-SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, manager.first_name, manager.last_name
+SELECT employee.id, employee.first_name, employee.last_name, role.role_title, role.salary, manager.first_name, manager.last_name
 FROM ((employee 
 LEFT JOIN role ON employee.role_id = role.id)
 LEFT JOIN manager ON  employee.manager_id=manager.id);
@@ -59,27 +59,28 @@ INNER JOIN employee ON role.id=employee.role_id
 INNER JOIN department ON  role.department_id=department.id;
 
 -- view employees by department
-SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary
+SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.name, role.salary
 FROM role
 INNER JOIN employee ON role.id=employee.role_id
 INNER JOIN department ON  role.department_id=department.id
-WHERE department.name='sales' 'engineering' 'finance' 'legal'
+WHERE department.department_name='sales' 'engineering' 'finance' 'legal'
 
 -- viewl all employees by roles
-SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary
-FROM employee
-INNER JOIN role ON employee.role_id=role.id WHERE role.title='salesperson' 
+SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.name, role.salary
+FROM role 
+INNER JOIN employee ON role.id=role_id 
+INNER JOIN department ON  role.department_id=department.id WHERE role.role_title='salesperson' 
 
 -- add employee
 INSERT INTO employee(first_name, last_name, role_id, manager_id)
 VALUES ()
 
 -- add roles
-INSERT INTO role(title, salary, department_id)
+INSERT INTO role(role_title, salary, department_id)
 VALUES ()
 
 -- add department
-INSERT INTO department(name)
+INSERT INTO department(department_name)
 VALUES ()
 
 -- update employee roles
