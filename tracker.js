@@ -29,9 +29,40 @@ function startapp(){
       choices: ["View all employees", "View all employees by department", "View all employees by roles", "Add employee", "Add department", "Add role", "Update employee role"]
     }
   ]).then(function(answer){
-        console.log("response recorded")
-        viewAllEmployees();
-      });
+      switch (answer.action) {
+        case "View all employees":
+          viewAllEmployees();
+          break;
+
+        case "View all employees by department":
+          multiSearch();
+          break;
+
+        case "View all employees by roles":
+          rangeSearch();
+          break;
+
+        case "Add employee":
+          songSearch();
+          break;
+        
+        case "Add department":
+          songSearch();
+          break;
+
+        case "Add role":
+          songSearch();
+          break;
+
+        case "Update employee role":
+          songSearch();
+          break;
+
+        case "exit":
+          connection.end();
+          break;
+        }
+    });
 }
 
 
@@ -42,13 +73,10 @@ function viewAllEmployees(){
     const query="SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary FROM role INNER JOIN employee ON role.id=employee.role_id INNER JOIN department ON  role.department_id=department.id"
     connection.query(query, function(err,res){
       if (err) throw err;
-        for(var i=0; i < res.length; i++){
-
-        }
+        console.table(res)
     })
+}
 
-
-
-
-
+function viewDepartment(){
+  const query=
 }
