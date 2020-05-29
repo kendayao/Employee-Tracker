@@ -36,23 +36,23 @@ function startapp(){
           break;
 
         case "View all employees by department":
-          viewDepartment();
+          getDepartment();
           break;
 
         case "View all employees by roles":
-          viewRoles();
+          getRoles();
           break;
 
         case "Add employee":
-          addEmployee();
+          getNewEmployeeRoles();
           break;
         
         case "Add department":
-          songSearch();
+          addDepartment();
           break;
 
         case "Add role":
-          songSearch();
+          getNewRole();
           break;
 
         case "Update employee role":
@@ -68,8 +68,6 @@ function startapp(){
 
 
 
-
-
 function viewAllEmployees(){
     const query="SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.department_name, role.salary FROM role INNER JOIN employee ON role.id=employee.role_id INNER JOIN department ON role.department_id=department.id"
       connection.query(query, function(err,res){
@@ -79,20 +77,24 @@ function viewAllEmployees(){
       });
 }
 
+var dept =[];
+function getDepartment(){
+  connection.query("SELECT department_name FROM department", function(error, response){
+    for (var i=0; i < response.length; i++){
+        dept.push(response[i].department_name);
+      }
+      viewDepartment();
+    });
+  
+}
+
 function viewDepartment(){
-    // const deptArray=[];
-    // connection.query("SELECT name FROM department", function(error, response){
-    //   for (var i=0; i < response.length; i++){
-    //       deptArray.push(response[i].name);
-    //     }
-        
-    // });
     inquirer.prompt([
       {
         type: "list",
         name: "department",
         message: "Choose the department",
-        choices: ["Sales", "Engineering", "Finance", "Legal"]
+        choices: dept
       }
     ]).then(function(answer){
       console.log("The " +answer.department + " Department")
@@ -105,13 +107,25 @@ function viewDepartment(){
         });
 }
 
+var roles =[];
+function getRoles(){
+  connection.query("SELECT role_title FROM role", function(error, response){
+    for (var i=0; i < response.length; i++){
+        roles.push(response[i].role_title);
+      }
+      viewRoles();
+    });
+  
+}
+
+
 function viewRoles(){
   inquirer.prompt([
     {
       type: "list",
       name: "role",
       message: "Choose the role",
-      choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Lead Accountant", "Accountant", "Legal Team Lead", "Lawyer"]
+      choices: roles
     }
   ]).then(function(answer){
     console.log("List of "+answer.role+"s")
@@ -124,6 +138,19 @@ function viewRoles(){
     })
 }
 
+
+
+var newemployeerolesArry =[];
+function getNewEmployeeRoles(){
+  connection.query("SELECT role_title FROM role", function(error, response){
+    for (var i=0; i < response.length; i++){
+        newemployeerolesArry.push(response[i].role_title);
+      }
+     
+      addEmployee();
+    });
+  
+}
 function addEmployee(){
   inquirer.prompt([
     {
@@ -140,7 +167,7 @@ function addEmployee(){
       type: "list",
       name: "role",
       message: "What is the employee's role?",
-      choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Lead Accountant", "Accountant", "Legal Team Lead", "Lawyer"]
+      choices: newemployeerolesArry
     },
     {
       type: "list",
@@ -150,36 +177,262 @@ function addEmployee(){
     }
 
   ]).then(function(answer){
-      if(answer.role==="Sales Lead"){
-        answer.role=1
-        console.log(answer.role)
-      }else if(answer.role==="Salesperson"){
-        answer.role=2
-      }else if(answer.role==="Lead Engineer"){
-        answer.role=3
-      }else if(answer.role==="Software Engineer"){
-        answer.role=4
-      }else if(answer.role==="Lead Accountant"){
-        answer.role=5
-      }else if(answer.role==="Accountant"){
-        answer.role=6
-      }else if(answer.role==="Legal Team Lead"){
-        answer.role=7
-      }else if(answer.role==="Lawyer"){
-        answer.role=8
-      }
-      if(answer.manager==="John Snow"){
-        answer.manager=1
-      }else if(answer.manager==="Kaeneth Dayao"){
-        answer.manager=2
-      }else if(answer.manager==="Tiffany Tsan"){
-        answer.manager=3
-      }else if(answer.manager==="Dan King"){
-        answer.manager=4
-      }else if(answer.manager==="None"){
-        answer.manager="Null"
-      }
-    console.log(answer.role)
-    console.log(answer.manager)
+      connection.query("SELECT id FROM role WHERE ?", {role_title: answer.role}, function(err, data){
+        if(err) throw error;
+
+        var roleId= data[0].id
+
+        if(answer.manager==="John Snow"){
+            answer.manager=1
+          }else if(answer.manager==="Kaeneth Dayao"){
+            answer.manager=2
+          }else if(answer.manager==="Tiffany Tsan"){
+            answer.manager=3
+          }else if(answer.manager==="Dan King"){
+            answer.manager=4
+          }else if(answer.manager==="None"){
+            answer.manager="Null"
+          }
+      
+        const query= "INSERT INTO employee SET ?"
+          connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: answer.manager}], function(err,data){
+          if (err) throw error;
+          console.log("New Employee added")
+        });
+      });
     });
 }
+
+function addDepartment(){
+  inquierer.prompt([
+    {
+      type: "input",
+      name: "department",
+      message: "What is the name of the new department?"
+    }
+  ]).then(function(answer){
+      const query="INSERT INTO department (department_name) VALUES (?)"
+        connection.query(query, [answer.deparment], function(err, data){
+          if (err) throw error;
+          console.log("New Deparment added")
+      });
+    });
+}
+
+
+
+var newDeptRoleArry =[];
+function getNewRole(){
+  connection.query("SELECT department_name FROM department", function(error, response){
+    for (var i=0; i < response.length; i++){
+        newDeptRoleArry.push(response[i].department_name);
+      }
+      addRole();
+    });
+  
+}
+
+
+function addRole(){
+  inquierer.prompt([
+    {
+      type: "input",
+      name: "role",
+      message: "What is the name of the new role?"
+    },
+    {
+      type: "input",
+      name: "salary",
+      message: "What is the salary of the new role?"
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "What department is the new role under?",
+      choices: newDeptRoleArry
+    },
+  ]).then(function(answer){
+
+
+
+
+
+
+
+
+
+
+      const query="INSERT INTO department (department_name) VALUES (?)"
+        connection.query(query, [answer.deparment], function(err, data){
+          if (err) throw error;
+          console.log("New Deparment added")
+      });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// if(answer.role==="Sales Lead"){
+//   answer.role=1
+//   console.log(answer.role)
+// }else if(answer.role==="Salesperson"){
+//   answer.role=2
+// }else if(answer.role==="Lead Engineer"){
+//   answer.role=3
+// }else if(answer.role==="Software Engineer"){
+//   answer.role=4
+// }else if(answer.role==="Lead Accountant"){
+//   answer.role=5
+// }else if(answer.role==="Accountant"){
+//   answer.role=6
+// }else if(answer.role==="Legal Team Lead"){
+//   answer.role=7
+// }else if(answer.role==="Lawyer"){
+//   answer.role=8
+// }
+// 
+
+// async function addEmployee(){
+//   const query="SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.department_name, role.salary FROM role INNER JOIN employee ON role.id=role_id INNER JOIN department ON role.department_id=department.id"
+//   const data = await connection.query(query)
+//   const choices = data.reduce((a,b)=>(a[b.role_title]=b.id,a),{})
+//   inquirer.prompt([
+//     {
+//       type: "input",
+//       name: "firstName",
+//       message: "What is the employee's first name?",
+//     },
+//     {
+//       type: "input",
+//       name: "lastName",
+//       message: "What is the employee's last name?",
+//     },
+//     {
+//       type: "list",
+//       name: "role",
+//       message: "What is the employee's role?",
+//       choices: Object.keys(choices)
+//     },
+//     {
+//       type: "list",
+//       name: "manager",
+//       message: "Who is the employees manager?",
+//       choices: ["John Snow", "Kaeneth Dayao", "Tiffany Tsan", "Dan King", "None"]
+//     }
+
+//   ]).then(function(answer){
+//     console.log('this is your role id ', choices[answer.role])
+//       if(answer.role==="Sales Lead"){
+//         answer.role=1
+//         console.log(answer.role)
+//       }else if(answer.role==="Salesperson"){
+//         answer.role=2
+//       }else if(answer.role==="Lead Engineer"){
+//         answer.role=3
+//       }else if(answer.role==="Software Engineer"){
+//         answer.role=4
+//       }else if(answer.role==="Lead Accountant"){
+//         answer.role=5
+//       }else if(answer.role==="Accountant"){
+//         answer.role=6
+//       }else if(answer.role==="Legal Team Lead"){
+//         answer.role=7
+//       }else if(answer.role==="Lawyer"){
+//         answer.role=8
+//       }
+//       if(answer.manager==="John Snow"){
+//         answer.manager=1
+//       }else if(answer.manager==="Kaeneth Dayao"){
+//         answer.manager=2
+//       }else if(answer.manager==="Tiffany Tsan"){
+//         answer.manager=3
+//       }else if(answer.manager==="Dan King"){
+//         answer.manager=4
+//       }else if(answer.manager==="None"){
+//         answer.manager="Null"
+//       }
+//       const query= "INSERT INTO employee SET ?"
+//       connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: answer.role, manager_id: answer.manager}], function(err,res){
+//         if (err) throw err;
+//         console.log("New Employee added")
+//       });
+//     });
+// }

@@ -53,7 +53,7 @@ LEFT JOIN role ON employee.role_id = role.id)
 LEFT JOIN manager ON  employee.manager_id=manager.id);
 
 -- view all employees with department
-SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary
+SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name, role.salary
 FROM role
 INNER JOIN employee ON role.id=employee.role_id
 INNER JOIN department ON  role.department_id=department.id;
@@ -87,3 +87,4 @@ VALUES ()
 UPDATE employee
 SET role_id = 5
 WHERE first_name=""AND last_name="";
+
