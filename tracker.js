@@ -32,6 +32,7 @@ function startapp(){
     }
   ]).then(function(answer){
     
+    // runs function based on user selection
       switch (answer.selection) {
         case "View all employees":
           viewAllEmployees();
@@ -89,7 +90,9 @@ function startapp(){
     });
 }
 
+// function to view all departments
 function viewAllDepartments(){
+  console.log("List of All Company Departments")
   connection.query("SELECT * FROM department", function(err,res){
     if (err) throw err;
         console.table(res)
@@ -97,7 +100,9 @@ function viewAllDepartments(){
     });
 }
 
+// function to view all roles
 function viewAllRoles(){
+  console.log("List of All Company Roles")
   connection.query("SELECT * FROM role", function(err,res){
     if (err) throw err;
         console.table(res)
@@ -105,10 +110,9 @@ function viewAllRoles(){
     });
 }
 
-
-
 // function to view all employees
 function viewAllEmployees(){
+  console.log("List Of All Company Employees")
     const query="SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.department_name, role.salary FROM role INNER JOIN employee ON role.id=employee.role_id INNER JOIN department ON role.department_id=department.id"
       connection.query(query, function(err,res){
         if (err) throw err;
@@ -239,7 +243,7 @@ function addManager(){
     let query="INSERT INTO manager (manager_name) VALUES (?)"
     connection.query(query, [answer.name], function(err, data){
       if (err) throw err;
-      console.log("New manager added")
+      console.log("New Manager Successfully Added!")
         startapp();
     });
   });
@@ -306,7 +310,7 @@ function addEmployee(){
           const query= "INSERT INTO employee SET ?"
           connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: managerId}], function(err,data){
             if (err) throw err;
-            console.log("New Employee added")
+            console.log("New Employee Successfully Added!")
             startapp();
           });
         }else{
@@ -316,7 +320,7 @@ function addEmployee(){
               const query= "INSERT INTO employee SET ?"
               connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: managerId}], function(err,data){
                 if (err) throw err;
-                console.log("New Employee added")
+                console.log("New Employee Successfully Added!")
                 startapp();
               });
             });
@@ -337,7 +341,7 @@ function addDepartment(){
       let query="INSERT INTO department (department_name) VALUES (?)"
         connection.query(query, [answer.department], function(err, data){
           if (err) throw err;
-          console.log("New Department added")
+          console.log("New Department Sucessfully Added")
           startapp();
       });
     });
@@ -383,7 +387,7 @@ function addRole(){
 
           connection.query("INSERT INTO role (role_title, salary, department_id) VALUES(?, ?, ?)", [answer.role, answer.salary, departmentId], function(err, data){
             if (err) throw err;
-            console.log("New Role Added")
+            console.log("New Role Successfully Added!")
             startapp();
           })
       });
@@ -441,7 +445,7 @@ function updateEmployeeManager(){
           let managerId=data[0].id
           connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [managerId, employeeId],function(err,data){
             if (err) throw err;
-              console.log("Employee Role Successfully Updated!")
+              console.log("Employee Manager Successfully Updated!")
               startapp();
           });
       });
@@ -571,118 +575,3 @@ function updateEmployeeRole(){
 
 
 
-// if(answer.manager==="John Snow"){
-  //     answer.manager=1
-  //   }else if(answer.manager==="Kaeneth Dayao"){
-  //     answer.manager=2
-  //   }else if(answer.manager==="Tiffany Tsan"){
-  //     answer.manager=3
-  //   }else if(answer.manager==="Dan King"){
-  //     answer.manager=4
-  //   }else if(answer.manager==="None"){
-  //     answer.manager=null
-  //   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// if(answer.role==="Sales Lead"){
-//   answer.role=1
-//   console.log(answer.role)
-// }else if(answer.role==="Salesperson"){
-//   answer.role=2
-// }else if(answer.role==="Lead Engineer"){
-//   answer.role=3
-// }else if(answer.role==="Software Engineer"){
-//   answer.role=4
-// }else if(answer.role==="Lead Accountant"){
-//   answer.role=5
-// }else if(answer.role==="Accountant"){
-//   answer.role=6
-// }else if(answer.role==="Legal Team Lead"){
-//   answer.role=7
-// }else if(answer.role==="Lawyer"){
-//   answer.role=8
-// }
-// 
-
-// async function addEmployee(){
-//   const query="SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.department_name, role.salary FROM role INNER JOIN employee ON role.id=role_id INNER JOIN department ON role.department_id=department.id"
-//   const data = await connection.query(query)
-//   const choices = data.reduce((a,b)=>(a[b.role_title]=b.id,a),{})
-//   inquirer.prompt([
-//     {
-//       type: "input",
-//       name: "firstName",
-//       message: "What is the employee's first name?",
-//     },
-//     {
-//       type: "input",
-//       name: "lastName",
-//       message: "What is the employee's last name?",
-//     },
-//     {
-//       type: "list",
-//       name: "role",
-//       message: "What is the employee's role?",
-//       choices: Object.keys(choices)
-//     },
-//     {
-//       type: "list",
-//       name: "manager",
-//       message: "Who is the employees manager?",
-//       choices: ["John Snow", "Kaeneth Dayao", "Tiffany Tsan", "Dan King", "None"]
-//     }
-
-//   ]).then(function(answer){
-//     console.log('this is your role id ', choices[answer.role])
-//       if(answer.role==="Sales Lead"){
-//         answer.role=1
-//         console.log(answer.role)
-//       }else if(answer.role==="Salesperson"){
-//         answer.role=2
-//       }else if(answer.role==="Lead Engineer"){
-//         answer.role=3
-//       }else if(answer.role==="Software Engineer"){
-//         answer.role=4
-//       }else if(answer.role==="Lead Accountant"){
-//         answer.role=5
-//       }else if(answer.role==="Accountant"){
-//         answer.role=6
-//       }else if(answer.role==="Legal Team Lead"){
-//         answer.role=7
-//       }else if(answer.role==="Lawyer"){
-//         answer.role=8
-//       }
-//       if(answer.manager==="John Snow"){
-//         answer.manager=1
-//       }else if(answer.manager==="Kaeneth Dayao"){
-//         answer.manager=2
-//       }else if(answer.manager==="Tiffany Tsan"){
-//         answer.manager=3
-//       }else if(answer.manager==="Dan King"){
-//         answer.manager=4
-//       }else if(answer.manager==="None"){
-//         answer.manager="Null"
-//       }
-//       const query= "INSERT INTO employee SET ?"
-//       connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: answer.role, manager_id: answer.manager}], function(err,res){
-//         if (err) throw err;
-//         console.log("New Employee added")
-//       });
-//     });
-// }
