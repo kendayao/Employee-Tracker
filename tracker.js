@@ -198,6 +198,7 @@ function addEmployee(){
           connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: answer.manager}], function(err,data){
           if (err) throw err;
           console.log("New Employee added")
+          startapp();
         });
       });
     });
@@ -215,6 +216,7 @@ function addDepartment(){
         connection.query(query, [answer.department], function(err, data){
           if (err) throw err;
           console.log("New Department added")
+          startapp();
       });
     });
 }
@@ -261,7 +263,7 @@ function addRole(){
           connection.query("INSERT INTO role (role_title, salary, department_id) VALUES(?, ?, ?)", [answer.role, answer.salary, departmentId], function(err, data){
             if (err) throw err;
             console.log("New Role Added")
-
+            startapp();
           })
       });
     });
@@ -321,6 +323,7 @@ function updateEmployeeRole(){
                connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleId, employeeId],function(err,data){
                   if (err) throw err;
                     console.log("Employee Role Successfully Updated!")
+                    startapp();
                   });
 
           }); 
