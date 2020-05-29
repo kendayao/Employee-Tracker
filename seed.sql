@@ -1,8 +1,3 @@
-DROP DATABASE IF EXISTS employee_db;
-CREATE database employee_db;
-
-USE employee_db;
-
 CREATE TABLE department (
     id  INT NOT NULL AUTO_INCREMENT,
     department_name VARCHAR(30),
@@ -11,7 +6,7 @@ CREATE TABLE department (
 
 CREATE TABLE role (
     id INT NOT NULL AUTO_INCREMENT,
-    role_title VARCHAR(30),
+    role_title VARCHAR(50),
     salary DECIMAL (10,2),
     department_id INT,
     PRIMARY KEY(id)
@@ -28,9 +23,7 @@ CREATE TABLE employee (
 
 CREATE TABLE manager (
     id INT NOT NULL AUTO_INCREMENT,
-    first_name VARCHAR(30),
-    last_name VARCHAR(30),
-    department_id INT,
+    manager_name VARCHAR(50),
     PRIMARY KEY(id)
 );
 
@@ -43,8 +36,6 @@ VALUES ("Sales Lead", 80000, 1), ("Salesperson", 60000, 1), ("Lead Engineer", 10
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("John", "Snow", 1, null), ("Chris", "Numan", 2, 1), ("Mario", "Chase", 2, 1), ("Kaeneth", "Dayao", 3, null), ("Alex", "Lee", 4, 2), ("Julian", "Fernandez", 4, 2), ("Tiffany", "Tsan", 5, null), ("George", "Frank", 6, 3), ("Anderson", "Keeper", 6, 3), ("Dan", "King", 7, null), ("Michael", "Bolt", 8, 4);
 
-INSERT INTO manager (first_name, last_name, department_id)
-VALUES ("John", "Snow", 1), ("Kaeneth", "Dayao", 2), ("Tiffany", "Tsan", 3), ("Dan", "King", 4);
-
-
+INSERT INTO manager (manager_name)
+VALUES ("John Snow"), ("Kaeneth Dayao"), ("Tiffany Tsan"), ("Dan King");
 

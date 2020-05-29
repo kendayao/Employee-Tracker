@@ -1,6 +1,6 @@
 // required packages
-var mysql = require("mysql");
-var inquirer=require("inquirer");
+const mysql = require("mysql");
+const inquirer=require("inquirer");
 const cTable = require('console.table');
 
 // mysql connection setup
@@ -118,12 +118,12 @@ function viewDepartment(){
           connection.query(query, {department_name: answer.department},function(err,res){
             if (err) throw err;           
             console.table(res)
-            startapp();
+              startapp();
             });
         });
 }
 
-// get all of the current roles and put them in an array to be used for inquirer prompt
+// get all of the current roles and put them in an array to be used for inquirer prompt to view employees based on roles
 var roles =[];
 function getRoles(){
   connection.query("SELECT role_title FROM role", function(error, response){
@@ -155,7 +155,7 @@ function viewRoles(){
     })
 }
 
-// get all of the current managers and put them in an array to be used for inquirer prompt
+// get all of the current managers and put them in an array to be used for inquirer prompt to view employees based on managers
 var managers =[];
 function getManagers(){
   connection.query("SELECT manager_name FROM manager", function(error, response){
@@ -186,19 +186,21 @@ function viewManagers(){
     });
 }
 
+//get all current employees and put them on an array to be used for inquirer prompt to add a new manager
 var employeesForManagersArry=[];
 function getEmployeesForManagers(){
   connection.query("SELECT first_name, last_name FROM employee", function(err, response){
     for (var i=0; i < response.length; i++){
-      var firstName=response[i].first_name;
+        var firstName=response[i].first_name;
         var lastName=response[i].last_name;
         var fullName=firstName + " "+ lastName;
-      employeesForManagersArry.push(fullName);
-    }
+        employeesForManagersArry.push(fullName);
+      }
     addManager();
   });
 }
 
+//function to add a new manager
 function addManager(){
   inquirer.prompt([
     {
@@ -212,12 +214,12 @@ function addManager(){
     connection.query(query, [answer.name], function(err, data){
       if (err) throw err;
       console.log("New manager added")
-      startapp();
+        startapp();
     });
   });
 }
 
-
+//get all current managers and put them in array to be used for inquirer prompt to add new employee
 var newemployeemanagersArry=[]
 function getNewEmployeesManagers(){
   connection.query("SELECT manager_name FROM manager", function(err, response){
@@ -229,7 +231,7 @@ function getNewEmployeesManagers(){
   });
 }
 
-//get all current roles and put them in array to be used for inquirer prompt
+//get all current roles and put them in array to be used for inquirer prompt to add new employee
 var newemployeerolesArry =[];
 function getNewEmployeeRoles(){
   connection.query("SELECT role_title FROM role", function(error, response){
@@ -282,25 +284,22 @@ function addEmployee(){
             startapp();
           });
         }else{
-
-        connection.query("SELECT id FROM manager WHERE ?", {manager_name: answer.manager}, function(err, data){
-          if(err) throw err;
-          var managerId= data[0].id
-        
-
-
-            const query= "INSERT INTO employee SET ?"
-            connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: managerId}], function(err,data){
-              if (err) throw err;
-              console.log("New Employee added")
-              startapp();
+          connection.query("SELECT id FROM manager WHERE ?", {manager_name: answer.manager}, function(err, data){
+            if(err) throw err;
+            var managerId= data[0].id
+              const query= "INSERT INTO employee SET ?"
+              connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: managerId}], function(err,data){
+                if (err) throw err;
+                console.log("New Employee added")
+                startapp();
+              });
             });
-          });
-        }
+          }
         });
     });
 }
 
+//function to add new department
 function addDepartment(){
   inquirer.prompt([
     {
@@ -318,8 +317,7 @@ function addDepartment(){
     });
 }
 
-
-
+//get all current department and put them in an array to be used in inquier prompt to add a new role
 var getDeptRoleArry =[];
 function getNewRole(){
   connection.query("SELECT department_name FROM department", function(error, response){
@@ -331,7 +329,7 @@ function getNewRole(){
   
 }
 
-
+//function to add a new role
 function addRole(){
   inquirer.prompt([
     {
@@ -366,6 +364,8 @@ function addRole(){
     });
 }
 
+
+//get all current managers and push them in an array to be used in inquirer prompt to update employee manager
 var managersupdatemanagerArry=[]
 function getManagersForUpdateManager(){
   connection.query("SELECT manager_name FROM manager", function(err, response){
@@ -376,6 +376,7 @@ function getManagersForUpdateManager(){
   });
 }
 
+//get all current employees in and push them in an array to be used in inquirer prompt to update employee manager
 var employeesupdatemanagerArry=[]
 function getEmployeesForUpdateManager(){
   connection.query("SELECT first_name, last_name FROM employee", function(err, response){
@@ -389,6 +390,7 @@ function getEmployeesForUpdateManager(){
   });
 }
 
+//function to update employee manager
 function updateEmployeeManager(){
   inquirer.prompt([
     {
@@ -422,9 +424,7 @@ function updateEmployeeManager(){
   }
 
 
-
-
-
+// get all current employees and push them in an arry to be used in inquirer prompt to update employee role
 var employees =[];
 function getEmployees(){
   connection.query("SELECT first_name, last_name FROM employee", function(error, response){
@@ -439,6 +439,7 @@ function getEmployees(){
   getRolesForUpdate();
 }
 
+// get all current roles and push them in an arry to be used in inquirer prompt to update employee role
 var rolesForUpdateArry =[];
 function getRolesForUpdate(){
   connection.query("SELECT role_title FROM role", function(error, response){
@@ -450,7 +451,7 @@ function getRolesForUpdate(){
   
 }
 
-
+// function to update employee role
 function updateEmployeeRole(){
   inquirer.prompt([
     {
@@ -467,6 +468,7 @@ function updateEmployeeRole(){
     },
   ]).then(function(answer){
       var name =answer.employee
+      //puts employee name in array to be accessed in employee table
       var nameArry= name.split(" ",2)
       
       connection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ?", [nameArry[0],nameArry[1]], function(err, data){
@@ -477,14 +479,10 @@ function updateEmployeeRole(){
                   if (err) throw err;
                     console.log("Employee Role Successfully Updated!")
                     startapp();
-                  });
-
+                });
           }); 
-
       });
-
     });
-
 }
 
 
