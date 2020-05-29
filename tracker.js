@@ -56,7 +56,7 @@ function startapp(){
           break;
 
         case "Update employee role":
-          songSearch();
+          getEmployees();
           break;
 
         case "exit":
@@ -191,7 +191,7 @@ function addEmployee(){
           }else if(answer.manager==="Dan King"){
             answer.manager=4
           }else if(answer.manager==="None"){
-            answer.manager="Null"
+            answer.manager=null
           }
       
         const query= "INSERT INTO employee SET ?"
@@ -263,27 +263,73 @@ function addRole(){
             console.log("New Role Added")
 
           })
-
-        
       });
-
-
-
-
-
-
-
-
-
-
-      // const query="INSERT INTO department (department_name) VALUES (?)"
-      //   connection.query(query, [answer.deparment], function(err, data){
-      //     if (err) throw error;
-      //     console.log("New Deparment added")
-      // });
     });
 }
 
+var employees =[];
+function getEmployees(){
+  connection.query("SELECT first_name, last_name FROM employee", function(error, response){
+    
+    for (var i=0; i < response.length; i++){
+        var firstName=response[i].first_name;
+        var lastName=response[i].last_name;
+        var fullName=firstName + " "+ lastName;
+        employees.push(fullName);
+      }
+  });
+  getRolesForUpdate();
+}
+
+var rolesForUpdateArry =[];
+function getRolesForUpdate(){
+  connection.query("SELECT role_title FROM role", function(error, response){
+    for (var i=0; i < response.length; i++){
+        rolesForUpdateArry.push(response[i].role_title);
+      }
+     
+      updateEmployeeRole();
+    });
+  
+}
+
+
+
+function updateEmployeeRole(){
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "employee",
+      message: "Name of employee you would like to update?",
+      choices: employees
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "What is their new role?",
+      choices: rolesForUpdateArry
+    },
+  ]).then(function(answer){
+      var name =answer.employee
+      var nameArry= name.split(" ",2)
+      
+      connection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ?", [nameArry[0],nameArry[1]], function(err, data){
+        employeeId=data[0].id
+        console.log(employeeId)
+          connection.query("SELECT id FROM role WHERE role_title = ? ", [answer.role], function(err, data){
+            let roleId=data[0].id
+               connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleId, employeeId],function(err,data){
+                  if (err) throw err;
+                    console.log("Employee Role Successfully Updated!")
+                  });
+
+          }); 
+
+      });
+
+    });
+
+}
 
 
 
