@@ -178,7 +178,7 @@ function addEmployee(){
 
   ]).then(function(answer){
       connection.query("SELECT id FROM role WHERE ?", {role_title: answer.role}, function(err, data){
-        if(err) throw error;
+        if(err) throw err;
 
         var roleId= data[0].id
 
@@ -196,7 +196,7 @@ function addEmployee(){
       
         const query= "INSERT INTO employee SET ?"
           connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: answer.manager}], function(err,data){
-          if (err) throw error;
+          if (err) throw err;
           console.log("New Employee added")
         });
       });
@@ -204,28 +204,28 @@ function addEmployee(){
 }
 
 function addDepartment(){
-  inquierer.prompt([
+  inquirer.prompt([
     {
       type: "input",
       name: "department",
       message: "What is the name of the new department?"
     }
   ]).then(function(answer){
-      const query="INSERT INTO department (department_name) VALUES (?)"
-        connection.query(query, [answer.deparment], function(err, data){
-          if (err) throw error;
-          console.log("New Deparment added")
+      let query="INSERT INTO department (department_name) VALUES (?)"
+        connection.query(query, [answer.department], function(err, data){
+          if (err) throw err;
+          console.log("New Department added")
       });
     });
 }
 
 
 
-var newDeptRoleArry =[];
+var getDeptRoleArry =[];
 function getNewRole(){
   connection.query("SELECT department_name FROM department", function(error, response){
     for (var i=0; i < response.length; i++){
-        newDeptRoleArry.push(response[i].department_name);
+        getDeptRoleArry.push(response[i].department_name);
       }
       addRole();
     });
@@ -234,7 +234,7 @@ function getNewRole(){
 
 
 function addRole(){
-  inquierer.prompt([
+  inquirer.prompt([
     {
       type: "input",
       name: "role",
@@ -247,26 +247,40 @@ function addRole(){
     },
     {
       type: "list",
-      name: "role",
+      name: "department",
       message: "What department is the new role under?",
-      choices: newDeptRoleArry
-    },
+      choices: getDeptRoleArry
+    }
   ]).then(function(answer){
+      let query = "SELECT id FROM department WHERE department_name = ?"
+      connection.query(query, [answer.department], function(err, data){
+        if(err) throw error
+          const departmentId=data[0].id
 
 
+          connection.query("INSERT INTO role (role_title, salary, department_id) VALUES(?, ?, ?)", [answer.role, answer.salary, departmentId], function(err, data){
+            if (err) throw err;
+            console.log("New Role Added")
 
+          })
 
-
-
-
-
-
-
-      const query="INSERT INTO department (department_name) VALUES (?)"
-        connection.query(query, [answer.deparment], function(err, data){
-          if (err) throw error;
-          console.log("New Deparment added")
+        
       });
+
+
+
+
+
+
+
+
+
+
+      // const query="INSERT INTO department (department_name) VALUES (?)"
+      //   connection.query(query, [answer.deparment], function(err, data){
+      //     if (err) throw error;
+      //     console.log("New Deparment added")
+      // });
     });
 }
 
