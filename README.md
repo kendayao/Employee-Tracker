@@ -29,13 +29,13 @@ So that I can organize and plan my business
 ## Installation
 
 
-You will need to npm install mysql and inquirer. You will also need to connect to the MySQL server.
+You will need to npm install mysql and inquirer. You will also need to connect to the MySQL server and run the query in the seed.sql file.
 
 
 ## Usage
 
 
-After installation, to run the application type in node server.js in your command line. You will be prompted to choose what you would like to do. You can view employees, departments, roles, and managers. You also have the ability to add new employees, managers, departments, and roles.
+After installation, to run the application type in node tracker.js in your command line. You will be prompted to choose what you would like to do. You can view employees, departments, roles, and managers. You also have the ability to add new employees, managers, departments, and roles.
 
 
 
@@ -65,5 +65,6 @@ For any questions, please contact kendayao at kendayao@gmail.com
 
 ## Deployed Application URL
 
+Video Demo of Application: https://youtu.be/u9cqWbXgdTg
 
-<img src="public/assets/images/notetakerapp.png" width="600" height="300">
+<img src="images/employeetracker.png" width="450" height="300">

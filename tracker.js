@@ -341,7 +341,7 @@ function addDepartment(){
       let query="INSERT INTO department (department_name) VALUES (?)"
         connection.query(query, [answer.department], function(err, data){
           if (err) throw err;
-          console.log("New Department Sucessfully Added")
+          console.log("New Department Sucessfully Added!")
           startapp();
       });
     });
