@@ -1,7 +1,9 @@
+// required packages
 var mysql = require("mysql");
 var inquirer=require("inquirer");
 const cTable = require('console.table');
 
+// mysql connection setup
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -13,24 +15,24 @@ var connection = mysql.createConnection({
 connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId + "\n");
-  
 });
 
+// function to start the app
 startapp();
 
-
+// function that renders what user wants to do
 function startapp(){
-  console.log("WELCOME TO THE EMPLOYEE MANAGER APPLICATION")
+  console.log("EMPLOYEE TRACKER APPLICATION")
   inquirer.prompt([
     {
       type: "list",
-      name: "choice",
+      name: "selection",
       message: "What would you like to do?",
-      choices: ["View all employees", "View all employees by department", "View all employees by roles", "Add employee", "Add department", "Add role", "Update employee role"]
+      choices: ["View all employees", "View all employees by department", "View all employees by roles", "View all employees by manager","Add manager", "Add employee", "Add department", "Add role", "Update employee manager", "Update employee role", "Exit"]
     }
   ]).then(function(answer){
     
-      switch (answer.choice) {
+      switch (answer.selection) {
         case "View all employees":
           viewAllEmployees();
           break;
@@ -42,9 +44,17 @@ function startapp(){
         case "View all employees by roles":
           getRoles();
           break;
+        
+        case "View all employees by manager":
+          getManagers();
+          break;
+
+        case "Add manager":
+          getEmployeesForManagers();
+          break;
 
         case "Add employee":
-          getNewEmployeeRoles();
+          getNewEmployeesManagers();
           break;
         
         case "Add department":
@@ -54,12 +64,16 @@ function startapp(){
         case "Add role":
           getNewRole();
           break;
+        
+        case "Update employee manager":
+          getManagersForUpdateManager()
+          break;
 
         case "Update employee role":
           getEmployees();
           break;
 
-        case "exit":
+        case "Exit":
           connection.end();
           break;
         }
@@ -67,7 +81,7 @@ function startapp(){
 }
 
 
-
+// function to view all employees
 function viewAllEmployees(){
     const query="SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.department_name, role.salary FROM role INNER JOIN employee ON role.id=employee.role_id INNER JOIN department ON role.department_id=department.id"
       connection.query(query, function(err,res){
@@ -77,6 +91,7 @@ function viewAllEmployees(){
       });
 }
 
+// get all of the current departments and put them in an array to be used for inquirer prompt
 var dept =[];
 function getDepartment(){
   connection.query("SELECT department_name FROM department", function(error, response){
@@ -88,6 +103,7 @@ function getDepartment(){
   
 }
 
+// function to view employees by department
 function viewDepartment(){
     inquirer.prompt([
       {
@@ -107,6 +123,7 @@ function viewDepartment(){
         });
 }
 
+// get all of the current roles and put them in an array to be used for inquirer prompt
 var roles =[];
 function getRoles(){
   connection.query("SELECT role_title FROM role", function(error, response){
@@ -118,7 +135,7 @@ function getRoles(){
   
 }
 
-
+//function to view employees based on roles
 function viewRoles(){
   inquirer.prompt([
     {
@@ -138,19 +155,93 @@ function viewRoles(){
     })
 }
 
+// get all of the current managers and put them in an array to be used for inquirer prompt
+var managers =[];
+function getManagers(){
+  connection.query("SELECT manager_name FROM manager", function(error, response){
+    for (var i=0; i < response.length; i++){
+        managers.push(response[i].manager_name);
+      }
+      viewManagers();
+    });
+}
+
+//function to view employees based on managers
+function viewManagers(){
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "manager",
+      message: "Choose the manager",
+      choices: managers
+    }
+  ]).then(function(answer){
+    console.log("List of Employees Managed by " + answer.manager)
+    let query="SELECT employee.id, employee.first_name, employee.last_name, role_title, manager_name FROM employee INNER JOIN manager ON employee.manager_id=manager.id INNER JOIN role ON role.id=role_id WHERE manager_name=?"
+    connection.query(query, [answer.manager], function(err,res){
+      if(err) throw err;
+          console.table(res)
+          startapp();
+    });
+    });
+}
+
+var employeesForManagersArry=[];
+function getEmployeesForManagers(){
+  connection.query("SELECT first_name, last_name FROM employee", function(err, response){
+    for (var i=0; i < response.length; i++){
+      var firstName=response[i].first_name;
+        var lastName=response[i].last_name;
+        var fullName=firstName + " "+ lastName;
+      employeesForManagersArry.push(fullName);
+    }
+    addManager();
+  });
+}
+
+function addManager(){
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "name",
+      message: "What is the name of the new manager",
+      choices: employeesForManagersArry
+    }
+  ]).then(function(answer){
+    let query="INSERT INTO manager (manager_name) VALUES (?)"
+    connection.query(query, [answer.name], function(err, data){
+      if (err) throw err;
+      console.log("New manager added")
+      startapp();
+    });
+  });
+}
 
 
+var newemployeemanagersArry=[]
+function getNewEmployeesManagers(){
+  connection.query("SELECT manager_name FROM manager", function(err, response){
+    for (var i=0; i < response.length; i++){
+      newemployeemanagersArry.push(response[i].manager_name);
+    }
+    newemployeemanagersArry.push("None")
+    getNewEmployeeRoles()
+  });
+}
+
+//get all current roles and put them in array to be used for inquirer prompt
 var newemployeerolesArry =[];
 function getNewEmployeeRoles(){
   connection.query("SELECT role_title FROM role", function(error, response){
     for (var i=0; i < response.length; i++){
         newemployeerolesArry.push(response[i].role_title);
       }
-     
       addEmployee();
     });
   
 }
+
+// function to add new employee
 function addEmployee(){
   inquirer.prompt([
     {
@@ -173,34 +264,40 @@ function addEmployee(){
       type: "list",
       name: "manager",
       message: "Who is the employees manager?",
-      choices: ["John Snow", "Kaeneth Dayao", "Tiffany Tsan", "Dan King", "None"]
+      choices: newemployeemanagersArry
     }
 
   ]).then(function(answer){
+      // get role id based on role chosen
       connection.query("SELECT id FROM role WHERE ?", {role_title: answer.role}, function(err, data){
         if(err) throw err;
-
         var roleId= data[0].id
 
-        if(answer.manager==="John Snow"){
-            answer.manager=1
-          }else if(answer.manager==="Kaeneth Dayao"){
-            answer.manager=2
-          }else if(answer.manager==="Tiffany Tsan"){
-            answer.manager=3
-          }else if(answer.manager==="Dan King"){
-            answer.manager=4
-          }else if(answer.manager==="None"){
-            answer.manager=null
-          }
-      
-        const query= "INSERT INTO employee SET ?"
-          connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: answer.manager}], function(err,data){
-          if (err) throw err;
-          console.log("New Employee added")
-          startapp();
+        if (answer.manager==="None"){
+          managerId=null
+          const query= "INSERT INTO employee SET ?"
+          connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: managerId}], function(err,data){
+            if (err) throw err;
+            console.log("New Employee added")
+            startapp();
+          });
+        }else{
+
+        connection.query("SELECT id FROM manager WHERE ?", {manager_name: answer.manager}, function(err, data){
+          if(err) throw err;
+          var managerId= data[0].id
+        
+
+
+            const query= "INSERT INTO employee SET ?"
+            connection.query(query,[{first_name: answer.firstName, last_name: answer.lastName, role_id: roleId, manager_id: managerId}], function(err,data){
+              if (err) throw err;
+              console.log("New Employee added")
+              startapp();
+            });
+          });
+        }
         });
-      });
     });
 }
 
@@ -269,6 +366,65 @@ function addRole(){
     });
 }
 
+var managersupdatemanagerArry=[]
+function getManagersForUpdateManager(){
+  connection.query("SELECT manager_name FROM manager", function(err, response){
+    for (var i=0; i < response.length; i++){
+      managersupdatemanagerArry.push(response[i].manager_name);
+    }
+    getEmployeesForUpdateManager()
+  });
+}
+
+var employeesupdatemanagerArry=[]
+function getEmployeesForUpdateManager(){
+  connection.query("SELECT first_name, last_name FROM employee", function(err, response){
+    for (var i=0; i < response.length; i++){
+      var firstName=response[i].first_name;
+        var lastName=response[i].last_name;
+        var fullName=firstName + " "+ lastName;
+        employeesupdatemanagerArry.push(fullName)
+    }
+    updateEmployeeManager()
+  });
+}
+
+function updateEmployeeManager(){
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "employee",
+      message: "Name of employee you would like to update their manager?",
+      choices: employeesupdatemanagerArry
+    },
+    {
+      type: "list",
+      name: "manager",
+      message: "Who is their new manager?",
+      choices: managersupdatemanagerArry
+    },
+  ]).then(function(answer){
+    var name =answer.employee
+    var nameArry= name.split(" ",2)
+    
+    connection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ?", [nameArry[0],nameArry[1]], function(err, data){
+      employeeId=data[0].id
+        connection.query("SELECT id FROM manager WHERE manager_name = ? ", [answer.manager], function(err, data){
+          let managerId=data[0].id
+          connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [managerId, employeeId],function(err,data){
+            if (err) throw err;
+              console.log("Employee Role Successfully Updated!")
+              startapp();
+          });
+      });
+    });
+  });
+  }
+
+
+
+
+
 var employees =[];
 function getEmployees(){
   connection.query("SELECT first_name, last_name FROM employee", function(error, response){
@@ -289,12 +445,10 @@ function getRolesForUpdate(){
     for (var i=0; i < response.length; i++){
         rolesForUpdateArry.push(response[i].role_title);
       }
-     
       updateEmployeeRole();
     });
   
 }
-
 
 
 function updateEmployeeRole(){
@@ -317,7 +471,6 @@ function updateEmployeeRole(){
       
       connection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ?", [nameArry[0],nameArry[1]], function(err, data){
         employeeId=data[0].id
-        console.log(employeeId)
           connection.query("SELECT id FROM role WHERE role_title = ? ", [answer.role], function(err, data){
             let roleId=data[0].id
                connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleId, employeeId],function(err,data){
@@ -394,7 +547,17 @@ function updateEmployeeRole(){
 
 
 
-
+// if(answer.manager==="John Snow"){
+  //     answer.manager=1
+  //   }else if(answer.manager==="Kaeneth Dayao"){
+  //     answer.manager=2
+  //   }else if(answer.manager==="Tiffany Tsan"){
+  //     answer.manager=3
+  //   }else if(answer.manager==="Dan King"){
+  //     answer.manager=4
+  //   }else if(answer.manager==="None"){
+  //     answer.manager=null
+  //   }
 
 
 

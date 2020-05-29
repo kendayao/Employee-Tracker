@@ -46,45 +46,5 @@ VALUES ("John", "Snow", 1, null), ("Chris", "Numan", 2, 1), ("Mario", "Chase", 2
 INSERT INTO manager (first_name, last_name, department_id)
 VALUES ("John", "Snow", 1), ("Kaeneth", "Dayao", 2), ("Tiffany", "Tsan", 3), ("Dan", "King", 4);
 
--- view all employees with manager
-SELECT employee.id, employee.first_name, employee.last_name, role.role_title, role.salary, manager.first_name, manager.last_name
-FROM ((employee 
-LEFT JOIN role ON employee.role_id = role.id)
-LEFT JOIN manager ON  employee.manager_id=manager.id);
 
--- view all employees with department
-SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name, role.salary
-FROM role
-INNER JOIN employee ON role.id=employee.role_id
-INNER JOIN department ON  role.department_id=department.id;
-
--- view employees by department
-SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.name, role.salary
-FROM role
-INNER JOIN employee ON role.id=employee.role_id
-INNER JOIN department ON  role.department_id=department.id
-WHERE department.department_name='sales' 'engineering' 'finance' 'legal'
-
--- viewl all employees by roles
-SELECT employee.id, employee.first_name, employee.last_name, role.role_title, department.name, role.salary
-FROM role 
-INNER JOIN employee ON role.id=role_id 
-INNER JOIN department ON  role.department_id=department.id WHERE role.role_title='salesperson' 
-
--- add employee
-INSERT INTO employee(first_name, last_name, role_id, manager_id)
-VALUES ()
-
--- add roles
-INSERT INTO role(role_title, salary, department_id)
-VALUES ()
-
--- add department
-INSERT INTO department(department_name)
-VALUES ()
-
--- update employee roles
-UPDATE employee
-SET role_id = 5
-WHERE first_name=""AND last_name="";
 
