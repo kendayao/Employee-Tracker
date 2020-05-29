@@ -28,7 +28,7 @@ function startapp(){
       type: "list",
       name: "selection",
       message: "What would you like to do?",
-      choices: ["View all employees", "View all employees by department", "View all employees by roles", "View all employees by manager","Add manager", "Add employee", "Add department", "Add role", "Update employee manager", "Update employee role", "Exit"]
+      choices: ["View all employees", "View all employees by department", "View all employees by roles", "View all employees by manager", "View all departments", "View all roles", "Add manager", "Add employee", "Add department", "Add role", "Update employee manager", "Update employee role", "Exit"]
     }
   ]).then(function(answer){
     
@@ -48,6 +48,15 @@ function startapp(){
         case "View all employees by manager":
           getManagers();
           break;
+
+        case "View all departments":
+          viewAllDepartments();
+          break;
+
+        case "View all roles":
+          viewAllRoles();
+          break;
+
 
         case "Add manager":
           getEmployeesForManagers();
@@ -79,6 +88,23 @@ function startapp(){
         }
     });
 }
+
+function viewAllDepartments(){
+  connection.query("SELECT * FROM department", function(err,res){
+    if (err) throw err;
+        console.table(res)
+          startapp();
+    });
+}
+
+function viewAllRoles(){
+  connection.query("SELECT * FROM role", function(err,res){
+    if (err) throw err;
+        console.table(res)
+          startapp();
+    });
+}
+
 
 
 // function to view all employees
