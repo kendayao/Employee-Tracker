@@ -2,11 +2,12 @@
 
 ## Description
 
-This is an employee management command line application. It allows users to view and add company departments, roles, and employees. This application is built using node, inquirer, and MySQL.
+Employee Tracker is a command line employee management application. This application allows users to view and add company departments, roles, and employees to their employee database.
 
 ## Table of Contents
 
 * [Description](#description)
+* [Technology](#Technology)
 * [User Story](#user-story)
 * [Installation](#installation)
 * [Usage](#usage)
@@ -15,6 +16,12 @@ This is an employee management command line application. It allows users to view
 * [Tests](#tests)
 * [Questions](#questions)
 * [Deployed Application URL](#deployed-application-URL)
+
+## Technology
+
+- Javascript
+- Inquirer
+- MySQL
 
 
 
